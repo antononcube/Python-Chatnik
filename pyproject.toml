@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Chatnik"
+version = "0.1.0"
+description = "CLI scripts for conversing with persistent LLM personas."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = [
+    "LLMFunctionObjects",
+    "LLMPrompts",
+    "xdg",
+]
+
+[project.scripts]
+llm_chat = "Chatnik.cli:llm_chat_main"
+llm_chat_meta = "Chatnik.cli:llm_chat_meta_main"
+
+[tool.setuptools.packages.find]
+include = ["Chatnik*"]
