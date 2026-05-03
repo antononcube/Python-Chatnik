@@ -11,6 +11,9 @@ from LLMFunctionObjects import Chat, llm_chat, llm_configuration, llm_evaluator
 from LLMPrompts import llm_prompt_data, llm_prompt_expand
 from xdg import xdg_data_home
 
+# =========================================================
+# Parametrization
+# =========================================================
 
 CHAT_OBJECTS_ENV_VAR = "CHATNIK_CHAT_OBJECTS_FILE"
 CHAT_OBJECTS_FILE_NAME = "chat_objects.json"
@@ -30,6 +33,23 @@ _CONFIG_KEYS = {
     "response_object_attribute",
     "response_value_keys",
 }
+
+# =========================================================
+# Utilities
+# =========================================================
+def _unquote(v):
+    if isinstance(v, str) and ((v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'"))):
+        return v[1:-1]
+    return v
+
+
+def _expand_path(path):
+    if not isinstance(path, str):
+        return None
+    path = os.path.expanduser(os.path.expandvars(path.strip()))
+    if not path:
+        return None
+    return path
 
 
 def _is_chat_conf_name(conf_name: str | None) -> bool:
@@ -51,6 +71,30 @@ def _filter_evaluator_args(conf_name: str | None, args: Mapping[str, Any]) -> di
             res[key] = value
     return res
 
+
+def _jsonable(value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(x) for x in value]
+    if isinstance(value, dict):
+        return {str(k): _jsonable(v) for k, v in value.items()}
+    return None
+
+
+def _configuration_to_dict(conf: Any) -> dict[str, Any]:
+    if conf is None:
+        return {}
+    data = conf.to_dict() if hasattr(conf, "to_dict") else dict(getattr(conf, "__dict__", {}))
+    res = {"name": getattr(conf, "name", data.get("name", "ChatGPT"))}
+    for key in _CONFIG_KEYS:
+        if key in data:
+            res[key] = _jsonable(data[key])
+    return {k: v for k, v in res.items() if v is not None}
+
+# =========================================================
+# Core funcs
+# =========================================================
 
 def get_chat_objects_file_name() -> str:
     """Return the JSON file used for persistent chat objects."""
@@ -83,28 +127,6 @@ def parse_model_spec(model: str | None, conf: str | None = None) -> tuple[str, s
         "palm": "Gemini",
     }
     return conf_map.get(provider_lc, provider.strip()), model_name.strip() or None
-
-
-def _jsonable(value: Any) -> Any:
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    if isinstance(value, (list, tuple)):
-        return [_jsonable(x) for x in value]
-    if isinstance(value, dict):
-        return {str(k): _jsonable(v) for k, v in value.items()}
-    return None
-
-
-def _configuration_to_dict(conf: Any) -> dict[str, Any]:
-    if conf is None:
-        return {}
-    data = conf.to_dict() if hasattr(conf, "to_dict") else dict(getattr(conf, "__dict__", {}))
-    res = {"name": getattr(conf, "name", data.get("name", "ChatGPT"))}
-    for key in _CONFIG_KEYS:
-        if key in data:
-            res[key] = _jsonable(data[key])
-    return {k: v for k, v in res.items() if v is not None}
-
 
 def create_chat_object(
     *,
@@ -234,7 +256,9 @@ def export_chats(
         json.dump(data, stream, ensure_ascii=False, indent=2, sort_keys=True)
 
 
-def load_llm_personas(**kwargs: Any) -> dict[str, Chat]:
+# This is an interesting idea. But in addition to all personas,
+# chat object creation based on a list of names should be implemented.
+def create_llm_personas(**kwargs: Any) -> dict[str, Chat]:
     """Create chat objects for all prompts categorized as personas."""
 
     personas: dict[str, Chat] = {}
@@ -245,7 +269,81 @@ def load_llm_personas(**kwargs: Any) -> dict[str, Chat]:
             personas[name] = create_chat_object(chat_id=name, prompt=prompt, **kwargs)
     return personas
 
+# ---------------------------------------------------------
+# Load pre-defined LLM personas
+# ---------------------------------------------------------
+def _normalize_personas(data):
+    personas = []
+    if isinstance(data, dict):
+        for k, v in data.items():
+            if isinstance(v, str):
+                spec = {"prompt": v}
+            elif isinstance(v, dict):
+                spec = dict(v)
+            else:
+                continue
+            spec.setdefault("chat_id", k)
+            personas.append(spec)
+    elif isinstance(data, list):
+        for v in data:
+            if isinstance(v, dict):
+                personas.append(dict(v))
+    return personas
 
+def _register_personas(personas):
+    chatObjects: dict[str, Chat] = {}
+    for spec in personas:
+        chat_id = spec.get("chat_id") or spec.get("id") or spec.get("name")
+        if not chat_id:
+            continue
+
+        prompt_spec = _unquote(spec.get("prompt", ""))
+        if isinstance(prompt_spec, str) and prompt_spec.strip():
+            prompt_spec = llm_prompt_expand(prompt_spec, messages=[], sep="\n")
+        else:
+            prompt_spec = ""
+
+        conf_name = spec.get("conf") or spec.get("configuration") or "ChatGPT"
+        conf_args = {}
+        for key in ["model", "max_tokens", "temperature", "base_url"]:
+            if spec.get(key) is not None:
+                conf_args[key] = spec[key]
+        conf_spec = llm_configuration(_unquote(conf_name), **conf_args)
+
+        evaluator_args = {}
+        if isinstance(spec.get("evaluator_args"), dict):
+            evaluator_args.update(spec.get("evaluator_args"))
+        if spec.get("api_key") is not None:
+            evaluator_args["api_key"] = spec.get("api_key")
+
+        chat_obj = llm_chat(prompt_spec, llm_evaluator=llm_evaluator(conf_spec, **evaluator_args))
+        chatObjects[chat_id] = chat_obj
+    return chatObjects
+
+
+def load_llm_personas(**kwargs: Any) -> dict[str, Chat]:
+    """Create chat objects for pre-defined LLM personas."""
+
+    personas_path = _expand_path(os.getenv("PYTHON_CHATBOOK_LLM_PERSONAS_CONF", ""))
+    if personas_path and os.path.isfile(personas_path):
+        path = personas_path
+    else:
+        return {}
+
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        personas = _normalize_personas(data)
+        return _register_personas(personas)
+    except Exception as e:
+        print(f"Chatnik pre-defined LLM personas load failed for {path}: {e}")
+
+    return {}
+
+
+# ---------------------------------------------------------
+# Evaluate message(s)
+# ---------------------------------------------------------
 def evaluate_message(message: str, chats: dict[str, Chat], **kwargs: Any) -> Any:
     """Evaluate a message using the same flow as ``JupyterChatbook.chat``."""
 
