@@ -65,17 +65,11 @@ The script `llm_chat` is used to create and chat with LLM personas (chat objects
 ```shell
 llm_chat -i=yoda1 --prompt @Yoda hi who are you
 ```
-```
-# Yoda, I am. Jedi Master, wise and old. Help you, I can. What seek you, hmm?
-```
 
 2. Continue the conversation with "yoda1":
 
 ```shell
 llm_chat -i=yoda1 since when do you use a green light saber
-```
-```
-# Green, my lightsaber is, yes. Jedi Consulars often wield green, they do. Focus on the Force and wisdom, they represent. Since my early days as a Jedi, carry green, I have. Strong in the Force, it is. Hmmm.
 ```
 
 **Remark:** The message input for `llm_chat` can be given in quotes. For example: `llm_chat 'Hi, again!' -i=yoda1`.
@@ -89,17 +83,11 @@ Summarize a file using the prompt ["Summarize"](https://resources.wolframcloud.c
 ```shell
 cat README.md | llm_chat --prompt=@Summarize
 ```
-```
-# Chatnik is a Python package that provides CLI scripts for persistent interaction with multiple LLM personas using OS files, translating the Raku package Chatnik into Python and enabling use of multiple LLMs and prompt collections from LLMPrompts. It includes scripts like `llm_chat` for chatting with LLM personas and `llm_chat_meta` for managing chat objects, supports various LLM providers, and allows advanced usage such as formatted output, clipboard integration, and mind-mapping. The package stores chat objects in a JSON file, supports customization through environment variables, and integrates with OS shell functionalities for flexible and persistent LLM interactions.
-```
 
 Summarize a file and then translate it to another language using the prompt ["Translate"](https://resources.wolframcloud.com/PromptRepository/resources/Translate):
 
 ```shell
 cat README.md | llm_chat --prompt=@Summarize | llm_chat -i=rt --prompt='!Translate|Russian'
-```
-```
-# Chatnik — это пакет Python, который предоставляет CLI-скрипты для постоянного взаимодействия с несколькими персонажами LLM с использованием файлов ОС, переводя пакет Raku Chatnik на Python и обеспечивая использование нескольких провайдеров LLM и расширений подсказок из LLMPrompts. Он предлагает команды, такие как `llm_chat` для общения и `llm_chat_meta` для управления объектами чата, поддерживает расширенные сценарии использования, такие как форматированный вывод, интеграция с буфером обмена и майнд-мэппинг, а также позволяет настраивать работу через переменные окружения и предопределённые персонажи LLM. Архитектура пакета основана на хранении объектов чата в JSON-файле, управляемом ОС, с бэкендом, который обрабатывает парсинг подсказок, их расширение, вызов LLM и сохранение объектов чата.
 ```
 
 **Remark:** The second `llm_chat` invocation has to use different chat object identifier because the default 
@@ -115,34 +103,11 @@ Here is its usage message:
 ```shell
 llm_chat_meta --help
 ```
-```
-# usage: llm_chat_meta [-h] [-i CHAT_ID] [--all] [-n N] [--index INDEX]
-#                      [--format FORMAT]
-#                      command
-# 
-# Meta processing of persistent LLM-chat objects.
-# 
-# positional arguments:
-#   command               Command, one of: card, clear, delete, file, first-
-#                         message, last-message, list, load-llm-personas,
-#                         message, messages.
-# 
-# options:
-#   -h, --help            show this help message and exit
-#   -i, --id, --chat-id CHAT_ID
-#   --all
-#   -n N
-#   --index INDEX
-#   --format FORMAT
-```
 
 List all chat objects ("chats" and "personas" are synonyms to "list"):
 
 ```shell
 llm_chat_meta list --format=json
-```
-```
-# [{"chat-id": "NONE", "context": "Summarize the following text using exactly 3 sentences. Do not add details or editorialize.\n\nThe text to summarize is:\n\n", "messages": 2, "llm-configuration": {"name": "chatgpt", "model": "gpt-4.1-mini"}}, {"chat-id": "rt", "context": "Translate the following text into Russia. Respond with only the translated text. Do not include any explanation or summary.\n\nn", "messages": 2, "llm-configuration": {"name": "chatgpt", "model": "gpt-4.1-mini"}}, {"chat-id": "yoda1", "context": "You are Yoda. \nRespond to ALL inputs in the voice of Yoda from Star Wars. \nBe sure to ALWAYS use his distinctive style and syntax. Vary sentence length.\n", "messages": 4, "llm-configuration": {"name": "chatgpt", "model": "gpt-4.1-mini"}}]
 ```
 
 Here we see the messages of "yoda1":
@@ -150,20 +115,11 @@ Here we see the messages of "yoda1":
 ```shell
 llm_chat_meta messages -i yoda1
 ```
-```
-# 0 : {"content": "hi who are you", "role": "user", "timestamp": 1777776637.491467}
-# 1 : {"content": "Yoda, I am. Jedi Master, wise and old. Help you, I can. What seek you, hmm?", "role": "assistant", "timestamp": 1777776639.539155}
-# 2 : {"content": "since when do you use a green light saber", "role": "user", "timestamp": 1777776640.151364}
-# 3 : {"content": "Green, my lightsaber is, yes. Jedi Consulars often wield green, they do. Focus on the Force and wisdom, they represent. Since my early days as a Jedi, carry green, I have. Strong in the Force, it is. Hmmm.", "role": "assistant", "timestamp": 1777776641.5899498}
-```
 
 Here we clear the messages:
 
 ```shell
 llm_chat_meta clear -i yoda1
-```
-```
-# Cleared the messages of chat object yoda1.
 ```
 
 **Remark:** Calling the script `chatnik` with the command `meta` has the same effect as `llm_chat_meta`.
@@ -177,120 +133,6 @@ For example, `chatnik meta clear -i yoda1` can be used instead of the previous c
 
 ```shell
 llm_chat -i=beta --model=ollama::gemma3:12b 'What are the populations of the Brazilian states? #NothingElse|"JSON data frame"' 
-```
-```
-# ```json
-# [
-#   {
-#     "State": "Acre",
-#     "Population": 878578
-#   },
-#   {
-#     "State": "Alagoas",
-#     "Population": 3432783
-#   },
-#   {
-#     "State": "Amapá",
-#     "Population": 846746
-#   },
-#   {
-#     "State": "Amazonas",
-#     "Population": 4287179
-#   },
-#   {
-#     "State": "Bahia",
-#     "Population": 14744216
-#   },
-#   {
-#     "State": "Ceará",
-#     "Population": 9187103
-#   },
-#   {
-#     "State": "Distrito Federal",
-#     "Population": 3477520
-#   },
-#   {
-#     "State": "Espírito Santo",
-#     "Population": 3790777
-#   },
-#   {
-#     "State": "Goiás",
-#     "Population": 7049167
-#   },
-#   {
-#     "State": "Maranhão",
-#     "Population": 7480937
-#   },
-#   {
-#     "State": "Mato Grosso",
-#     "Population": 3567237
-#   },
-#   {
-#     "State": "Mato Grosso do Sul",
-#     "Population": 3033651
-#   },
-#   {
-#     "State": "Minas Gerais",
-#     "Population": 21523251
-#   },
-#   {
-#     "State": "Pará",
-#     "Population": 8717926
-#   },
-#   {
-#     "State": "Paraíba",
-#     "Population": 4116775
-#   },
-#   {
-#     "State": "Paraná",
-#     "Population": 11527436
-#   },
-#   {
-#     "State": "Pernambuco",
-#     "Population": 9615933
-#   },
-#   {
-#     "State": "Piauí",
-#     "Population": 6576496
-#   },
-#   {
-#     "State": "Rio de Janeiro",
-#     "Population": 17425727
-#   },
-#   {
-#     "State": "Rio Grande do Norte",
-#     "Population": 3507013
-#   },
-#   {
-#     "State": "Rio Grande do Sul",
-#     "Population": 11366663
-#   },
-#   {
-#     "State": "Rondônia",
-#     "Population": 1127557
-#   },
-#   {
-#     "State": "Roraima",
-#     "Population": 517096
-#   },
-#   {
-#     "State": "Santa Catarina",
-#     "Population": 7149582
-#   },
-#   {
-#     "State": "São Paulo",
-#     "Population": 46278787
-#   },
-#   {
-#     "State": "Sergipe",
-#     "Population": 2300427
-#   },
-#   {
-#     "State": "Tocantins",
-#     "Population": 1572922
-#   }
-# ]
-# ```
 ```
 
 ### Make a request, echo, and place in clipboard  
@@ -411,35 +253,6 @@ the following pipeline can be used to tabulate the summary the LLM personas:
 
 ```shell
 llm_chat_meta list --format=json | data-translation | w3m -T text/html -dump -cols 120
-```
-```
-# ┌────────────────────┬───────────────────────────────────────────────────────────────────────────────┬───────┬────────┐
-# │ llm-configuration  │                                    context                                    │chat-id│messages│
-# ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
-# │┌─────┬────────────┐│                                                                               │       │        │
-# ││model│gpt-4.1-mini││Summarize the following text using exactly 3 sentences. Do not add details or  │       │        │
-# │├─────┼────────────┤│editorialize. The text to summarize is:                                        │NONE   │2       │
-# ││name │chatgpt     ││                                                                               │       │        │
-# │└─────┴────────────┘│                                                                               │       │        │
-# ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
-# │┌──────┬───────────┐│                                                                               │       │        │
-# ││model │gemma3:12b ││                                                                               │       │        │
-# │├──────┼───────────┤│                                                                               │beta   │2       │
-# ││ name │ollama     ││                                                                               │       │        │
-# │└──────┴───────────┘│                                                                               │       │        │
-# ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
-# │┌─────┬────────────┐│                                                                               │       │        │
-# ││model│gpt-4.1-mini││Translate the following text into Russia. Respond with only the translated     │       │        │
-# │├─────┼────────────┤│text. Do not include any explanation or summary. n                             │rt     │2       │
-# ││name │chatgpt     ││                                                                               │       │        │
-# │└─────┴────────────┘│                                                                               │       │        │
-# ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
-# │┌─────┬────────────┐│                                                                               │       │        │
-# ││model│gpt-4.1-mini││You are Yoda. Respond to ALL inputs in the voice of Yoda from Star Wars. Be    │       │        │
-# │├─────┼────────────┤│sure to ALWAYS use his distinctive style and syntax. Vary sentence length.     │yoda1  │0       │
-# ││name │chatgpt     ││                                                                               │       │        │
-# │└─────┴────────────┘│                                                                               │       │        │
-# └────────────────────┴───────────────────────────────────────────────────────────────────────────────┴───────┴────────┘
 ```
 
 -----
