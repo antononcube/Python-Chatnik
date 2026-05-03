@@ -118,7 +118,10 @@ def create_chat_object(
 ) -> Chat:
     """Create an ``LLMFunctionObjects.Chat`` object without evaluating it."""
 
-    conf_spec, model_name = parse_model_spec(model, conf=conf)
+    model_local = model
+    if model_local is None or model_local.strip() == "":
+        model_local = os.environ.get("CHATNIK_DEFAULT_MODEL", "")
+    conf_spec, model_name = parse_model_spec(model_local, conf=conf)
     conf_args = {k: v for k, v in kwargs.items() if k in _CONFIG_KEYS and v is not None}
     if model_name:
         conf_args["model"] = model_name
