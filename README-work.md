@@ -297,6 +297,8 @@ To load the predefined LLM personas use the command:
 llm_chat_meta load-llm-personas
 ```
 
+**Remark:** Snake_case CLI commands are also allowed, e.g., `llm_chat_meta load_llm_personas`.
+
 -----
 
 ## Implementation details

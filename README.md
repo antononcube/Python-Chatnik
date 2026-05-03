@@ -75,7 +75,7 @@ llm_chat -i=yoda1 --prompt @Yoda hi who are you
 llm_chat -i=yoda1 since when do you use a green light saber
 ```
 ```
-# Green, my lightsaber is, yes. Jedi Consulars often wield green, they do. Focus on the Force and wisdom, they represent. Since my early days as a Jedi, carry green, I have. Strong in the Force, it is. Hmmm.
+# Green, my lightsaber is. Symbol of a Jedi Consular, it is. Wisdom and harmony, it represents. Since many years, I have wielded it. Strong in the Force, I am. Use the Force, you must, young one.
 ```
 
 **Remark:** The message input for `llm_chat` can be given in quotes. For example: `llm_chat 'Hi, again!' -i=yoda1`.
@@ -90,7 +90,7 @@ Summarize a file using the prompt ["Summarize"](https://resources.wolframcloud.c
 cat README.md | llm_chat --prompt=@Summarize
 ```
 ```
-# Chatnik is a Python package that provides CLI scripts for persistent interaction with multiple LLM personas using OS files, translating the Raku package Chatnik into Python and enabling use of multiple LLMs and prompt collections from LLMPrompts. It includes scripts like `llm_chat` for chatting with LLM personas and `llm_chat_meta` for managing chat objects, supports various LLM providers, and allows advanced usage such as formatted output, clipboard integration, and mind-mapping. The package stores chat objects in a JSON file, supports customization through environment variables, and integrates with OS shell functionalities for flexible and persistent LLM interactions.
+# Chatnik is a Python package providing CLI scripts for persistent interaction with multiple LLM personas using OS files, translating the Raku package Chatnik into Python and enabling use of multiple LLMs and prompt collections from LLMPrompts. It includes scripts like `llm_chat` for chatting with LLM personas and `llm_chat_meta` for managing chat objects, supports various LLM providers, and allows advanced usage such as formatted output, clipboard integration, and mind-mapping. The package stores chat objects in a JSON file, supports customization through environment variables, and integrates with OS shell functionalities for flexible and persistent LLM interactions.
 ```
 
 Summarize a file and then translate it to another language using the prompt ["Translate"](https://resources.wolframcloud.com/PromptRepository/resources/Translate):
@@ -99,7 +99,7 @@ Summarize a file and then translate it to another language using the prompt ["Tr
 cat README.md | llm_chat --prompt=@Summarize | llm_chat -i=rt --prompt='!Translate|Russian'
 ```
 ```
-# Chatnik — это пакет Python, который предоставляет CLI-скрипты для постоянного взаимодействия с несколькими персонажами LLM с использованием файлов ОС, переводя пакет Raku Chatnik на Python и обеспечивая использование нескольких провайдеров LLM и расширений подсказок из LLMPrompts. Он предлагает команды, такие как `llm_chat` для общения и `llm_chat_meta` для управления объектами чата, поддерживает расширенные сценарии использования, такие как форматированный вывод, интеграция с буфером обмена и майнд-мэппинг, а также позволяет настраивать работу через переменные окружения и предопределённые персонажи LLM. Архитектура пакета основана на хранении объектов чата в JSON-файле, управляемом ОС, с бэкендом, который обрабатывает парсинг подсказок, их расширение, вызов LLM и сохранение объектов чата.
+# Chatnik — это пакет Python, предоставляющий CLI-скрипты для постоянного взаимодействия с несколькими персонажами LLM с использованием файлов ОС, эффективно переводящий пакет Raku Chatnik на Python и позволяющий использовать нескольких поставщиков LLM и коллекции подсказок из LLMPrompts. Он предлагает команды, такие как `llm_chat` для общения с персонажами LLM и `llm_chat_meta` для управления объектами чата, поддерживает расширенные функции, такие как форматированный вывод, интеграция с буфером обмена, создание ментальных карт и настройка через переменные окружения и предопределённые персонажи. Архитектура пакета использует JSON-файл для постоянного хранения объектов чата, интегрируется с различными LLM-бэкендами (OpenAI, Gemini, Ollama) и обеспечивает гибкое взаимодействие с LLM через оболочку ОС посредством обработки подсказок и рабочих процессов оценки.
 ```
 
 **Remark:** The second `llm_chat` invocation has to use different chat object identifier because the default 
@@ -151,10 +151,10 @@ Here we see the messages of "yoda1":
 llm_chat_meta messages -i yoda1
 ```
 ```
-# 0 : {"content": "hi who are you", "role": "user", "timestamp": 1777776637.491467}
-# 1 : {"content": "Yoda, I am. Jedi Master, wise and old. Help you, I can. What seek you, hmm?", "role": "assistant", "timestamp": 1777776639.539155}
-# 2 : {"content": "since when do you use a green light saber", "role": "user", "timestamp": 1777776640.151364}
-# 3 : {"content": "Green, my lightsaber is, yes. Jedi Consulars often wield green, they do. Focus on the Force and wisdom, they represent. Since my early days as a Jedi, carry green, I have. Strong in the Force, it is. Hmmm.", "role": "assistant", "timestamp": 1777776641.5899498}
+# 0 : {"content": "hi who are you", "role": "user", "timestamp": 1777822449.4402719}
+# 1 : {"content": "Yoda, I am. Jedi Master, wise and old. Help you, I can. What seek you, hmm?", "role": "assistant", "timestamp": 1777822451.635432}
+# 2 : {"content": "since when do you use a green light saber", "role": "user", "timestamp": 1777822452.271043}
+# 3 : {"content": "Green, my lightsaber is. Symbol of a Jedi Consular, it is. Wisdom and harmony, it represents. Since many years, I have wielded it. Strong in the Force, I am. Use the Force, you must, young one.", "role": "assistant", "timestamp": 1777822454.728773}
 ```
 
 Here we clear the messages:
@@ -183,23 +183,23 @@ llm_chat -i=beta --model=ollama::gemma3:12b 'What are the populations of the Bra
 # [
 #   {
 #     "State": "Acre",
-#     "Population": 878578
+#     "Population": 878573
 #   },
 #   {
 #     "State": "Alagoas",
-#     "Population": 3432783
+#     "Population": 3432751
 #   },
 #   {
 #     "State": "Amapá",
-#     "Population": 846746
+#     "Population": 857561
 #   },
 #   {
 #     "State": "Amazonas",
-#     "Population": 4287179
+#     "Population": 4291854
 #   },
 #   {
 #     "State": "Bahia",
-#     "Population": 14744216
+#     "Population": 14703953
 #   },
 #   {
 #     "State": "Ceará",
@@ -207,67 +207,67 @@ llm_chat -i=beta --model=ollama::gemma3:12b 'What are the populations of the Bra
 #   },
 #   {
 #     "State": "Distrito Federal",
-#     "Population": 3477520
+#     "Population": 3471755
 #   },
 #   {
 #     "State": "Espírito Santo",
-#     "Population": 3790777
+#     "Population": 3777783
 #   },
 #   {
 #     "State": "Goiás",
-#     "Population": 7049167
+#     "Population": 7092265
 #   },
 #   {
 #     "State": "Maranhão",
-#     "Population": 7480937
+#     "Population": 7417049
 #   },
 #   {
 #     "State": "Mato Grosso",
-#     "Population": 3567237
+#     "Population": 3567235
 #   },
 #   {
 #     "State": "Mato Grosso do Sul",
-#     "Population": 3033651
+#     "Population": 3033527
 #   },
 #   {
 #     "State": "Minas Gerais",
-#     "Population": 21523251
+#     "Population": 21522290
 #   },
 #   {
 #     "State": "Pará",
-#     "Population": 8717926
+#     "Population": 8727638
 #   },
 #   {
 #     "State": "Paraíba",
-#     "Population": 4116775
+#     "Population": 4174027
 #   },
 #   {
 #     "State": "Paraná",
-#     "Population": 11527436
+#     "Population": 11536695
 #   },
 #   {
 #     "State": "Pernambuco",
-#     "Population": 9615933
+#     "Population": 9616276
 #   },
 #   {
 #     "State": "Piauí",
-#     "Population": 6576496
+#     "Population": 6543227
 #   },
 #   {
 #     "State": "Rio de Janeiro",
-#     "Population": 17425727
+#     "Population": 17490000
 #   },
 #   {
 #     "State": "Rio Grande do Norte",
-#     "Population": 3507013
+#     "Population": 3504078
 #   },
 #   {
 #     "State": "Rio Grande do Sul",
-#     "Population": 11366663
+#     "Population": 11366750
 #   },
 #   {
 #     "State": "Rondônia",
-#     "Population": 1127557
+#     "Population": 1150914
 #   },
 #   {
 #     "State": "Roraima",
@@ -275,19 +275,19 @@ llm_chat -i=beta --model=ollama::gemma3:12b 'What are the populations of the Bra
 #   },
 #   {
 #     "State": "Santa Catarina",
-#     "Population": 7149582
+#     "Population": 7121086
 #   },
 #   {
 #     "State": "São Paulo",
-#     "Population": 46278787
+#     "Population": 46272318
 #   },
 #   {
 #     "State": "Sergipe",
-#     "Population": 2300427
+#     "Population": 2300270
 #   },
 #   {
 #     "State": "Tocantins",
-#     "Population": 1572922
+#     "Population": 1570928
 #   }
 # ]
 # ```
@@ -417,21 +417,21 @@ llm_chat_meta list --format=json | data-translation | w3m -T text/html -dump -co
 # │ llm-configuration  │                                    context                                    │chat-id│messages│
 # ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
 # │┌─────┬────────────┐│                                                                               │       │        │
-# ││model│gpt-4.1-mini││Summarize the following text using exactly 3 sentences. Do not add details or  │       │        │
+# ││name │chatgpt     ││Summarize the following text using exactly 3 sentences. Do not add details or  │       │        │
 # │├─────┼────────────┤│editorialize. The text to summarize is:                                        │NONE   │2       │
-# ││name │chatgpt     ││                                                                               │       │        │
+# ││model│gpt-4.1-mini││                                                                               │       │        │
 # │└─────┴────────────┘│                                                                               │       │        │
 # ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
 # │┌──────┬───────────┐│                                                                               │       │        │
-# ││model │gemma3:12b ││                                                                               │       │        │
-# │├──────┼───────────┤│                                                                               │beta   │2       │
 # ││ name │ollama     ││                                                                               │       │        │
+# │├──────┼───────────┤│                                                                               │beta   │2       │
+# ││model │gemma3:12b ││                                                                               │       │        │
 # │└──────┴───────────┘│                                                                               │       │        │
 # ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
 # │┌─────┬────────────┐│                                                                               │       │        │
-# ││model│gpt-4.1-mini││Translate the following text into Russia. Respond with only the translated     │       │        │
+# ││name │chatgpt     ││Translate the following text into Russia. Respond with only the translated     │       │        │
 # │├─────┼────────────┤│text. Do not include any explanation or summary. n                             │rt     │2       │
-# ││name │chatgpt     ││                                                                               │       │        │
+# ││model│gpt-4.1-mini││                                                                               │       │        │
 # │└─────┴────────────┘│                                                                               │       │        │
 # ├────────────────────┼───────────────────────────────────────────────────────────────────────────────┼───────┼────────┤
 # │┌─────┬────────────┐│                                                                               │       │        │
@@ -483,6 +483,8 @@ To load the predefined LLM personas use the command:
 ```
 llm_chat_meta load-llm-personas
 ```
+
+**Remark:** Snake_case CLI commands are also allowed, e.g., `llm_chat_meta load_llm_personas`.
 
 -----
 
