@@ -32,6 +32,26 @@ _CONFIG_KEYS = {
 }
 
 
+def _is_chat_conf_name(conf_name: str | None) -> bool:
+    if not conf_name:
+        return False
+    return str(conf_name).strip().lower().startswith("chat")
+
+
+def _filter_evaluator_args(conf_name: str | None, args: Mapping[str, Any]) -> dict[str, Any]:
+    """Keep evaluator kwargs compatible with the chosen evaluator class."""
+
+    allowed = {"formatron"}
+    if _is_chat_conf_name(conf_name):
+        allowed.update({"context", "examples", "user_role", "assistant_role", "system_role"})
+
+    res: dict[str, Any] = {}
+    for key, value in args.items():
+        if key in allowed and value is not None:
+            res[key] = value
+    return res
+
+
 def get_chat_objects_file_name() -> str:
     """Return the JSON file used for persistent chat objects."""
 
@@ -105,7 +125,10 @@ def create_chat_object(
 
     prompt_spec = llm_prompt_expand(prompt, messages=[], sep="\n") if prompt else ""
     conf_obj = llm_configuration(conf_spec, **conf_args)
-    evaluator_args = {k: v for k, v in kwargs.items() if k not in _CONFIG_KEYS}
+    evaluator_args = _filter_evaluator_args(
+        conf_obj.name,
+        {k: v for k, v in kwargs.items() if k not in _CONFIG_KEYS},
+    )
     chat = llm_chat(prompt_spec, llm_evaluator=llm_evaluator(conf_obj, **evaluator_args))
     chat.chat_id = chat_id
     chat.messages = list(messages or [])
@@ -124,19 +147,23 @@ def chat_object_to_dict(chat: Chat | Mapping[str, Any], chat_id: str | None = No
 
     evaluator = getattr(chat, "llm_evaluator", None)
     conf = getattr(evaluator, "conf", None)
+    conf_dict = _configuration_to_dict(conf)
+    evlr = {
+        "conf": conf_dict,
+        "context": getattr(evaluator, "context", None),
+        "examples": getattr(evaluator, "examples", None),
+        "formatron": getattr(evaluator, "formatron", None),
+    }
+    if _is_chat_conf_name(conf_dict.get("name")):
+        evlr["user_role"] = getattr(evaluator, "user_role", "user")
+        evlr["assistant_role"] = getattr(evaluator, "assistant_role", "assistant")
+        evlr["system_role"] = getattr(evaluator, "system_role", "system")
+
     record_id = chat_id or getattr(chat, "chat_id", "") or "NONE"
     return {
         "id": record_id,
         "type": "chat",
-        "llm_evaluator": {
-            "conf": _configuration_to_dict(conf),
-            "context": getattr(evaluator, "context", None),
-            "examples": getattr(evaluator, "examples", None),
-            "formatron": getattr(evaluator, "formatron", None),
-            "user_role": getattr(evaluator, "user_role", "user"),
-            "assistant_role": getattr(evaluator, "assistant_role", "assistant"),
-            "system_role": getattr(evaluator, "system_role", "system"),
-        },
+        "llm_evaluator": evlr,
         "messages": list(getattr(chat, "messages", []) or []),
         "examples": list(getattr(chat, "examples", []) or []),
     }
@@ -159,9 +186,13 @@ def to_chat_object(data: Chat | Mapping[str, Any], chat_id: str | None = None) -
         context = context[1:-1]
 
     kwargs = {k: v for k, v in conf_data.items() if k in _CONFIG_KEYS}
-    for key in ("formatron", "user_role", "assistant_role", "system_role"):
-        if key in evaluator_data and evaluator_data[key] is not None:
-            kwargs[key] = evaluator_data[key]
+    evaluator_kwargs: dict[str, Any] = {}
+    if "formatron" in evaluator_data and evaluator_data["formatron"] is not None:
+        evaluator_kwargs["formatron"] = evaluator_data["formatron"]
+    if _is_chat_conf_name(conf_name):
+        for key in ("context", "examples", "user_role", "assistant_role", "system_role"):
+            if key in evaluator_data and evaluator_data[key] is not None:
+                evaluator_kwargs[key] = evaluator_data[key]
 
     return create_chat_object(
         chat_id=chat_id or record.get("id", "NONE"),
@@ -170,6 +201,7 @@ def to_chat_object(data: Chat | Mapping[str, Any], chat_id: str | None = None) -
         messages=list(record.get("messages") or []),
         examples=list(record.get("examples") or []),
         **kwargs,
+        **evaluator_kwargs,
     )
 
 
