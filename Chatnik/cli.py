@@ -155,7 +155,7 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
         print("Deleted all chat objects.")
         return 0
 
-    if command in {"load-llm-personas", "load-personas"}:
+    if command in {"load-llm-personas", "load_llm_personas", "load-personas", "load_personas"}:
         chats = _load_raw_chats()
         personas = {key: chat_object_to_dict(value, key) for key, value in load_llm_personas(**kwargs).items()}
         common = sorted(set(chats).intersection(personas))
@@ -179,7 +179,7 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
 
     chats = _load_raw_chats()
 
-    if command in {"list", "personas", "chats", "chat-objects", "chatobjects"}:
+    if command in {"list", "personas", "chats", "chat-objects", "chat_objects", "chatobjects"}:
         if not chats:
             print("No chat objects.")
             return 0
@@ -211,7 +211,7 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
             print(_cannot_find(args.chat_id))
         return 0
 
-    if command in {"card", "form", "table-form"} and not args.all:
+    if command in {"card", "form", "table-form", "table_form"} and not args.all:
         record = chats.get(args.chat_id)
         print(json.dumps(record, ensure_ascii=False, indent=2) if record else _cannot_find(args.chat_id))
         return 0
@@ -236,7 +236,7 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
                 print(f"{index} : {json.dumps(message, ensure_ascii=False)}")
         return 0
 
-    if command in {"first-message", "firstmessage", "last-message", "lastmessage"} and not args.all:
+    if command in {"first-message", "first_message", "firstmessage", "last-message", "last_message", "lastmessage"} and not args.all:
         record = chats.get(args.chat_id)
         if record is None:
             print(_cannot_find(args.chat_id))
@@ -249,13 +249,13 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
         print(message.get("content", message) if isinstance(message, dict) else message)
         return 0
 
-    if command in {"message", "take-message", "takemessage"} and not args.all:
+    if command in {"message", "take-message", "take_message", "takemessage"} and not args.all:
         record = chats.get(args.chat_id)
         if record is None:
             print(_cannot_find(args.chat_id))
             return 0
         if args.index is None:
-            print("The message index is not specfied; use --index.")
+            print("The message index is not specified; use --index.")
             return 0
         messages = list(record.get("messages") or [])
         try:
@@ -265,13 +265,13 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
             print(f"Cannot find message with index {args.index}.")
         return 0
 
-    if command in {"clear", "clear-messages", "clearmessages"} and args.all:
+    if command in {"clear", "clear-messages", "clear_messages", "clearmessages"} and args.all:
         for record in chats.values():
             record["messages"] = []
         _save_raw_chats(chats)
         return 0
 
-    if command in {"clear", "clear-messages", "clearmessages"}:
+    if command in {"clear", "clear-messages", "clear_messages", "clearmessages"}:
         record = chats.get(args.chat_id)
         if record is None:
             print(_cannot_find(args.chat_id))
