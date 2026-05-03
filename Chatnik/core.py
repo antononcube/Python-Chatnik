@@ -93,9 +93,8 @@ def _configuration_to_dict(conf: Any) -> dict[str, Any]:
     return {k: v for k, v in res.items() if v is not None}
 
 # =========================================================
-# Core funcs
+# Chat objects import and export
 # =========================================================
-
 def get_chat_objects_file_name() -> str:
     """Return the JSON file used for persistent chat objects."""
 
@@ -269,9 +268,9 @@ def create_llm_personas(**kwargs: Any) -> dict[str, Chat]:
             personas[name] = create_chat_object(chat_id=name, prompt=prompt, **kwargs)
     return personas
 
-# ---------------------------------------------------------
+# =========================================================
 # Load pre-defined LLM personas
-# ---------------------------------------------------------
+# =========================================================
 def _normalize_personas(data):
     personas = []
     if isinstance(data, dict):
@@ -303,11 +302,15 @@ def _register_personas(personas):
         else:
             prompt_spec = ""
 
-        conf_name = spec.get("conf") or spec.get("configuration") or "ChatGPT"
-        conf_args = {}
-        for key in ["model", "max_tokens", "temperature", "base_url"]:
-            if spec.get(key) is not None:
-                conf_args[key] = spec[key]
+        model_local = spec.get("model", None)
+        if model_local is None or model_local.strip() == "":
+            model_local = os.environ.get("CHATNIK_DEFAULT_MODEL", "")
+        conf = spec.get("conf", None)
+        conf_name, model_name = parse_model_spec(model_local, conf=conf)
+        conf_args = {k: v for k, v in spec.items() if k in _CONFIG_KEYS and k != 'model' and v is not None}
+        if model_name:
+            conf_args["model"] = model_name
+
         conf_spec = llm_configuration(_unquote(conf_name), **conf_args)
 
         evaluator_args = {}
@@ -341,9 +344,9 @@ def load_llm_personas(**kwargs: Any) -> dict[str, Chat]:
     return {}
 
 
-# ---------------------------------------------------------
+# =========================================================
 # Evaluate message(s)
-# ---------------------------------------------------------
+# =========================================================
 def evaluate_message(message: str, chats: dict[str, Chat], **kwargs: Any) -> Any:
     """Evaluate a message using the same flow as ``JupyterChatbook.chat``."""
 
