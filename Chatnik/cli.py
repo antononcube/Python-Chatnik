@@ -216,6 +216,35 @@ def llm_chat_meta_main(argv: list[str] | None = None) -> int:
         print(json.dumps(record, ensure_ascii=False, indent=2) if record else _cannot_find(args.chat_id))
         return 0
 
+    if command in {"context", "prompt"} and args.all:
+        if args.format.lower() == "json":
+            res = {}
+            for chat_id, record in chats.items():
+                evaluator = record.get("llm_evaluator") or record.get("llm-evaluator") or {}
+                context = evaluator.get("context") or ""
+                res[chat_id] = context
+            print(json.dumps(res))
+        else:
+            for chat_id, record in chats.items():
+                print("=" * 60)
+                print(f"Chat ID: {chat_id}")
+                print("-" * 60)
+                evaluator = record.get("llm_evaluator") or record.get("llm-evaluator") or {}
+                context = evaluator.get("context") or ""
+                print(context)
+        return 0
+
+
+    if command in {"context", "prompt"} and not args.all:
+        if args.chat_id in chats:
+            record = chats.get(args.chat_id)
+            evaluator = record.get("llm_evaluator") or record.get("llm-evaluator") or {}
+            context = evaluator.get("context") or f"Empty context for chat object {args.chat_id}."
+            print(context)
+        else:
+            print(_cannot_find(args.chat_id))
+        return 0
+
     if command == "messages" and args.all:
         for chat_id, record in chats.items():
             print("=" * 60)
