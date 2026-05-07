@@ -80,8 +80,6 @@ llm_chat -i=yoda1 since when do you use a green light saber
 
 **Remark:** The message input for `llm_chat` can be given in quotes. For example: `llm_chat 'Hi, again!' -i=yoda1`.
 
-**Remark:** The script `chatnik` can be used instead of `llm_chat`.
-
 ### Apply prompt(s) to shell pipeline output
 
 Summarize a file using the prompt ["Summarize"](https://resources.wolframcloud.com/PromptRepository/resources/Summarize):
