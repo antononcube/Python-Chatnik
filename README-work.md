@@ -120,9 +120,6 @@ Here we clear the messages:
 llm_chat_meta clear -i yoda1
 ```
 
-**Remark:** Calling the script `chatnik` with the command `meta` has the same effect as `llm_chat_meta`.
-For example, `chatnik meta clear -i yoda1` can be used instead of the previous command. 
-
 -----
 
 ## Advanced usage examples
